@@ -56,9 +56,9 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
-            type=pep440,pattern={{ version }},enable=${{ steps.ctx.is_release }}
-            type=raw,value=latest,enable=${{ steps.ctx.is_release }}
-            type=raw,value=develop,enable=${{ ! steps.ctx.is_release }}
+            type=pep440,pattern={{ version }},enable=${{ steps.ctx.outputs.is_release }}
+            type=raw,value=latest,enable=${{ steps.ctx.outputs.is_release }}
+            type=raw,value=develop,enable=${{ ! steps.ctx.outputs.is_release }}
 
       - uses: docker/build-push-action@v4
         with:
