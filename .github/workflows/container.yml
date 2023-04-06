@@ -25,6 +25,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Gather context
+        id: ctx
+        run: |
+          echo is_release=${{ github.event_name == "tag" }} >> $GITHUB_OUTPUT
+          echo created=$(date --rfc-3339=seconds) >> $GITHUB_OUTPUT
+          echo version=$(git describe --always) >> $GITHUB_OUTPUT
+          echo commit=$(git rev-parse -q --verify HEAD^{commit}) >> $GITHUB_OUTPUT
+
       # QEMU is used to set up VMs for building non-x86_64 images.
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
@@ -48,16 +56,9 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
-            type=pep440,pattern={{ version }},enable={{ is_default_branch }}
-            type=raw,value=latest,enable={{ is_default_branch }}
-            type=raw,value=develop,enable={{ ! is_default_branch }}
-
-      - name: Set build-args
-        id: build_args
-        run: |
-          echo created=$(date --rfc-3339=seconds) >> $GITHUB_OUTPUT
-          echo version=$(git describe --always) >> $GITHUB_OUTPUT
-          echo commit=$(git rev-parse -q --verify HEAD^{commit}) >> $GITHUB_OUTPUT
+            type=pep440,pattern={{ version }},enable=${{ steps.ctx.is_release }}
+            type=raw,value=latest,enable=${{ steps.ctx.is_release }}
+            type=raw,value=develop,enable=${{ ! steps.ctx.is_release }}
 
       - uses: docker/build-push-action@v4
         with:
@@ -66,7 +67,7 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
-            CREATED=${{ steps.build_args.outputs.created }}
-            VERSION=${{ steps.build_args.outputs.version }}
-            COMMIT=${{ steps.build_args.outputs.commit }}
+            CREATED=${{ steps.ctx.outputs.created }}
+            VERSION=${{ steps.ctx.outputs.version }}
+            COMMIT=${{ steps.ctx.outputs.commit }}
           file: container/Dockerfile
