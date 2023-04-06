@@ -28,7 +28,7 @@ jobs:
       - name: Gather context
         id: ctx
         run: |
-          echo is_release=${{ github.event_name == "tag" }} >> $GITHUB_OUTPUT
+          echo is_release=${{ github.event_name == 'tag' }} >> $GITHUB_OUTPUT
           echo created=$(date --rfc-3339=seconds) >> $GITHUB_OUTPUT
           echo version=$(git describe --always) >> $GITHUB_OUTPUT
           echo commit=$(git rev-parse -q --verify HEAD^{commit}) >> $GITHUB_OUTPUT
