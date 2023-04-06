@@ -50,7 +50,7 @@ jobs:
           tags: |
             type=pep440,pattern={{ version }},enable={{ is_default_branch }}
             type=raw,value=latest,enable={{ is_default_branch }}
-            type=raw,value=develop,enable={{ not is_default_branch }}
+            type=raw,value=develop,enable={{ ! is_default_branch }}
 
       - name: Set build-args
         id: build_args
