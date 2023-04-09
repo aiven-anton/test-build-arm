@@ -29,7 +29,7 @@ jobs:
         id: ctx
         run: |
           echo is_release=${{ contains(github.ref, 'refs/tags/') }} | tee -a $GITHUB_OUTPUT
-          echo is_dev=${{ contains(github.ref, 'refs/tags/') }} | tee -a $GITHUB_OUTPUT
+          echo is_dev=${{ ! contains(github.ref, 'refs/tags/') }} | tee -a $GITHUB_OUTPUT
           echo created=$(date --rfc-3339=seconds) | tee -a $GITHUB_OUTPUT
           echo version=$(git describe --always) | tee -a $GITHUB_OUTPUT
           echo commit=$(git rev-parse -q --verify HEAD^{commit}) | tee -a $GITHUB_OUTPUT
